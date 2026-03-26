@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aplikasi Prediksi Cuaca</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>Prediksi Cuaca</h1>
+    </header>
+
+    <main>
+        <!-- Control Section -->
+        <section class="control-section" aria-label="Kontrol aplikasi">
+            <form id="searchForm" class="search-form">
+                <input
+                    type="text"
+                    id="searchInput"
+                    placeholder="Cari kota atau lokasi..."
+                    autocomplete="off"
+                    aria-label="Masukkan nama kota atau lokasi"
+                >
+                <button type="submit" aria-label="Cari cuaca">Cari</button>
+            </form>
+
+            <div class="action-buttons">
+                <button id="refreshBtn" aria-label="Refresh data cuaca">⟲ Refresh</button>
+                <button id="geolocateBtn" aria-label="Deteksi lokasi saat ini">📍 Lokasi Saya</button>
+            </div>
+
+            <div class="meta-info">
+                <time id="lastUpdated">Terakhir diupdate: --:--</time>
+                <span id="dataSource">Data dari OpenWeatherMap</span>
+            </div>
+        </section>
+
+        <!-- Loading State -->
+        <section id="loadingState" class="loading-state" hidden aria-live="polite">
+            <p>Memuat data cuaca...</p>
+        </section>
+
+        <!-- Error State -->
+        <section id="errorState" class="error-state" hidden role="alert" aria-live="assertive">
+            <h2>Terjadi Kesalahan</h2>
+            <p id="errorMessage">--</p>
+            <button id="retryBtn">Coba Lagi</button>
+        </section>
+
+        <!-- Current Weather Section -->
+        <section class="current-weather" aria-label="Cuaca saat ini" id="weatherContent">
+            <h2>Cuaca Saat Ini</h2>
+
+            <div class="location-info">
+                <h3 id="locationName">Jakarta, Indonesia</h3>
+                <p id="currentDate">26 Maret 2026</p>
+            </div>
+
+            <div class="weather-main">
+                <div class="weather-icon" role="img" aria-label="Ikon cuaca berawan">
+                    <svg id="weatherIcon" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+                        <circle cx="50" cy="40" r="30" fill="#FFD700"/>
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                    </svg>
+                </div>
+
+                <div class="temperature-info">
+                    <div class="temperature">
+                        <span id="currentTemp">28</span>
+                        <span class="unit">°C</span>
+                    </div>
+                    <p id="weatherDescription">Berawan</p>
+                </div>
+            </div>
+
+            <dl class="weather-details" role="list">
+                <div class="detail-item" role="listitem">
+                    <dt>Terasa Seperti</dt>
+                    <dd id="feelsLike">26°C</dd>
+                </div>
+                <div class="detail-item" role="listitem">
+                    <dt>Kelembaban</dt>
+                    <dd id="humidity">75%</dd>
+                </div>
+                <div class="detail-item" role="listitem">
+                    <dt>Kecepatan Angin</dt>
+                    <dd id="windSpeed">15 km/h</dd>
+                </div>
+                <div class="detail-item" role="listitem">
+                    <dt>Tekanan Udara</dt>
+                    <dd id="pressure">1013 mb</dd>
+                </div>
+                <div class="detail-item" role="listitem">
+                    <dt>Visibilitas</dt>
+                    <dd id="visibility">10 km</dd>
+                </div>
+                <div class="detail-item" role="listitem">
+                    <dt>Index UV</dt>
+                    <dd id="uvIndex">6</dd>
+                </div>
+            </dl>
+        </section>
+
+        <!-- Hourly Forecast Section -->
+        <section class="hourly-forecast" aria-label="Prediksi cuaca per jam">
+            <h2>Prediksi Per Jam</h2>
+            <div class="hourly-container" role="list">
+                <article class="hourly-item" role="listitem">
+                    <time>12:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Cerah" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <circle cx="50" cy="50" r="25" fill="#FFD700"/>
+                    </svg>
+                    <span class="hourly-temp">28°C</span>
+                    <span class="hourly-rain">10%</span>
+                </article>
+                <article class="hourly-item" role="listitem">
+                    <time>13:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Cerah" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <circle cx="50" cy="50" r="25" fill="#FFD700"/>
+                    </svg>
+                    <span class="hourly-temp">29°C</span>
+                    <span class="hourly-rain">5%</span>
+                </article>
+                <article class="hourly-item" role="listitem">
+                    <time>14:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Cerah" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <circle cx="50" cy="50" r="25" fill="#FFD700"/>
+                    </svg>
+                    <span class="hourly-temp">30°C</span>
+                    <span class="hourly-rain">0%</span>
+                </article>
+                <article class="hourly-item" role="listitem">
+                    <time>15:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Berawan" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                    </svg>
+                    <span class="hourly-temp">29°C</span>
+                    <span class="hourly-rain">15%</span>
+                </article>
+                <article class="hourly-item" role="listitem">
+                    <time>16:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Hujan Ringan" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                        <line x1="35" y1="75" x2="33" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="55" y1="75" x2="53" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="75" y1="75" x2="73" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                    </svg>
+                    <span class="hourly-temp">27°C</span>
+                    <span class="hourly-rain">30%</span>
+                </article>
+                <article class="hourly-item" role="listitem">
+                    <time>17:00</time>
+                    <svg class="hourly-icon" viewBox="0 0 100 100" role="img" aria-label="Hujan" xmlns="http://www.w3.org/2000/svg" width="50" height="50">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#808080"/>
+                        <line x1="35" y1="75" x2="33" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="55" y1="75" x2="53" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="75" y1="75" x2="73" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                    </svg>
+                    <span class="hourly-temp">25°C</span>
+                    <span class="hourly-rain">50%</span>
+                </article>
+            </div>
+        </section>
+
+        <!-- 5-Day Forecast Section -->
+        <section class="daily-forecast" aria-label="Prediksi cuaca 5 hari">
+            <h2>Prediksi 5 Hari</h2>
+            <div class="forecast-container" role="list">
+                <article class="forecast-item" role="listitem">
+                    <h4>Kamis</h4>
+                    <time class="forecast-date">27 Mar</time>
+                    <svg class="forecast-icon" viewBox="0 0 100 100" role="img" aria-label="Berawan" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                    </svg>
+                    <div class="forecast-temps">
+                        <span class="temp-high">31°C</span>
+                        <span class="temp-low">24°C</span>
+                    </div>
+                    <p class="forecast-description">Berawan</p>
+                    <span class="rain-chance">20%</span>
+                </article>
+
+                <article class="forecast-item" role="listitem">
+                    <h4>Jumat</h4>
+                    <time class="forecast-date">28 Mar</time>
+                    <svg class="forecast-icon" viewBox="0 0 100 100" role="img" aria-label="Cerah" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="50" cy="50" r="25" fill="#FFD700"/>
+                    </svg>
+                    <div class="forecast-temps">
+                        <span class="temp-high">32°C</span>
+                        <span class="temp-low">25°C</span>
+                    </div>
+                    <p class="forecast-description">Cerah</p>
+                    <span class="rain-chance">5%</span>
+                </article>
+
+                <article class="forecast-item" role="listitem">
+                    <h4>Sabtu</h4>
+                    <time class="forecast-date">29 Mar</time>
+                    <svg class="forecast-icon" viewBox="0 0 100 100" role="img" aria-label="Hujan Ringan" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                        <line x1="35" y1="75" x2="33" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="55" y1="75" x2="53" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="75" y1="75" x2="73" y2="85" stroke="#4A90E2" stroke-width="2"/>
+                    </svg>
+                    <div class="forecast-temps">
+                        <span class="temp-high">30°C</span>
+                        <span class="temp-low">23°C</span>
+                    </div>
+                    <p class="forecast-description">Hujan Ringan</p>
+                    <span class="rain-chance">60%</span>
+                </article>
+
+                <article class="forecast-item" role="listitem">
+                    <h4>Minggu</h4>
+                    <time class="forecast-date">30 Mar</time>
+                    <svg class="forecast-icon" viewBox="0 0 100 100" role="img" aria-label="Hujan" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#808080"/>
+                        <line x1="35" y1="75" x2="33" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="55" y1="75" x2="53" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                        <line x1="75" y1="75" x2="73" y2="88" stroke="#4A90E2" stroke-width="2"/>
+                    </svg>
+                    <div class="forecast-temps">
+                        <span class="temp-high">28°C</span>
+                        <span class="temp-low">22°C</span>
+                    </div>
+                    <p class="forecast-description">Hujan</p>
+                    <span class="rain-chance">80%</span>
+                </article>
+
+                <article class="forecast-item" role="listitem">
+                    <h4>Senin</h4>
+                    <time class="forecast-date">31 Mar</time>
+                    <svg class="forecast-icon" viewBox="0 0 100 100" role="img" aria-label="Berawan" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M 30 55 Q 30 70 45 70 L 75 70 Q 85 70 85 60 Q 85 50 75 50 Q 72 40 60 40 Q 50 30 40 35 Q 25 40 30 55" fill="#B0B0B0"/>
+                    </svg>
+                    <div class="forecast-temps">
+                        <span class="temp-high">29°C</span>
+                        <span class="temp-low">23°C</span>
+                    </div>
+                    <p class="forecast-description">Berawan</p>
+                    <span class="rain-chance">35%</span>
+                </article>
+            </div>
+        </section>
+
+        <!-- Alert Section -->
+        <section class="alerts" aria-label="Peringatan cuaca" id="alertsSection" hidden>
+            <h2>⚠️ Peringatan Cuaca</h2>
+            <div class="alert-list" role="list">
+                <article class="alert-item alert-warning" role="listitem" aria-live="polite">
+                    <div class="alert-header">
+                        <strong>Peringatan Panas Tinggi</strong>
+                        <time class="alert-time">--:--</time>
+                    </div>
+                    <p>Suhu akan mencapai 32°C pada siang hari. Hindari paparan sinar matahari langsung dan tetap terhidrasi.</p>
+                </article>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 Aplikasi Prediksi Cuaca. Data dari OpenWeatherMap</p>
+    </footer>
+    <script src="script.js"></script>
+</body>
+</html>
